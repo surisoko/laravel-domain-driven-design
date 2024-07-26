@@ -1,0 +1,63 @@
+services:
+  php:
+    build: .docker/php
+    container_name: php
+    environment:
+      - DB_HOST=postgresql_db
+      - DB_DATABASE=laravel-ddd
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    ports:
+      - 5173:5173
+    volumes:
+      - .:/var/www:cached
+    depends_on:
+      postgresql:
+        condition: service_healthy
+        restart: true
+      nginx:
+        condition: service_started
+    networks:
+      - app-network
+
+  nginx:
+    container_name: nginx
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - .:/var/www
+      - .docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - .docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - app-network
+
+  postgresql:
+    container_name: postgresql_db
+    image: postgres:14.3-alpine
+    tty: true
+    restart: always
+    environment:
+      - POSTGRES_DB=laravel-ddd
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d laravel-ddd" ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  pgdata:
+    driver: local
