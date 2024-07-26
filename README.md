@@ -1,5 +1,5 @@
 # Laravel Domain Driven Design
-Simple project in laravel using domain driven design https://github.com/surisoko/laravel-domain-driven-design
+Simple project in laravel using domain driven design
 
 ## Start project in a docker container 🐳
 
