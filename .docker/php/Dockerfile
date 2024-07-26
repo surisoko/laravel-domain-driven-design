@@ -23,5 +23,3 @@ EXPOSE 5173
 
 RUN chown -R www-data:www-data /var/www
 WORKDIR /var/www
-
-ENTRYPOINT "php artisan migrate" && /bin/bash
